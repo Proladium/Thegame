@@ -1,8 +1,20 @@
+// Constants for the game
+const CANVAS_WIDTH = 800;
+const CANVAS_HEIGHT = 600;
+const PLAYER_WIDTH = 50;
+const PLAYER_HEIGHT = 50;
+const PLAYER_SPEED = 5;
+const OBJECT_WIDTH = 50;
+const OBJECT_HEIGHT = 50;
+const OBJECT_SPEED_MIN = 5;
+const OBJECT_SPEED_MAX = 10;
+const SPAWN_INTERVAL = 2000;
+
 // Player class
 class Player {
   constructor() {
-    this.x = 0;
-    this.y = 0;
+    this.x = CANVAS_WIDTH / 2 - PLAYER_WIDTH / 2;
+    this.y = CANVAS_HEIGHT - PLAYER_HEIGHT;
     this.vx = 0;
     this.vy = 0;
     this.width = PLAYER_WIDTH;
@@ -11,31 +23,57 @@ class Player {
   }
 
   move(keys) {
-    if (keys['ArrowLeft']) {
-      this.vx = -this.speed;
-    } else if (keys['ArrowRight']) {
-      this.vx = this.speed;
-    } else {
-      this.vx = 0;
+    const previousX = this.x;
+    const previousY = this.y;
+  
+    if (keys['ArrowLeft'] && this.x > 0) {
+      this.x -= this.speed;
+    } else if (keys['ArrowRight'] && this.x + this.width < CANVAS_WIDTH) {
+      this.x += this.speed;
     }
-
+  
     if (keys['ArrowUp'] && this.y === 0) {
       this.vy = -this.speed * 2;
     }
-
+  
     this.vy += 1;
     this.x += this.vx;
     this.y += this.vy;
-
+  
     if (this.y > 0) {
       this.y = 0;
       this.vy = 0;
     }
+  
+    // Check collision with objects
+    for (let object of this.objects) {
+      if (this.isColliding(object)) {
+        this.x = previousX;
+        this.y = previousY;
+        break;
+      }
+    }
   }
+  
+  isColliding(object) {
+    if (
+      this.x < object.x + object.width &&
+      this.x + this.width > object.x &&
+      this.y < object.y + object.height &&
+      this.y + this.height > object.y
+    ) {
+      return true;
+    }
+    return false;
+  }
+  
+  
+  
 
   draw(ctx, camera) {
-    ctx.fillRect(this.x, CANVAS_HEIGHT - this.height - this.y - camera.y, this.width, this.height);
-  }
+    ctx.fillStyle = 'blue'; // Set the player color
+    ctx.fillRect(this.x, this.y - camera.y, this.width, this.height);
+  }  
 }
 
 // Object class
@@ -43,7 +81,7 @@ class FallingObject {
   constructor() {
     this.x = Math.random() * CANVAS_WIDTH;
     this.y = CANVAS_HEIGHT;
-    this.vy = Math.random() * (OBJECT_SPEED_MAX - OBJECT_SPEED_MIN) + OBJECT_SPEED_MIN;
+    this.vy = -Math.random() * (OBJECT_SPEED_MAX - OBJECT_SPEED_MIN) + OBJECT_SPEED_MIN;
     this.width = OBJECT_WIDTH;
     this.height = OBJECT_HEIGHT;
   }
@@ -53,6 +91,7 @@ class FallingObject {
   }
 
   draw(ctx, camera) {
+    ctx.fillStyle = 'red'; // Set the object color
     ctx.fillRect(this.x, this.y - camera.y, this.width, this.height);
   }
 }
@@ -90,21 +129,22 @@ class Game {
 
   loop() {
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-
+  
     this.player.move(this.keys);
-    this.player.draw(this.ctx, this.camera);
-
+    this.player.draw(this.ctx, this.camera); // Add this line to call the draw method
+  
     for (let object of this.objects) {
       object.move();
       object.draw(this.ctx, this.camera);
     }
-
+  
     this.camera.update(this.player);
-
+  
     requestAnimationFrame(() => this.loop());
   }
 
   start() {
+    document.body.style.margin = 0;
     this.loop();
   }
 }
