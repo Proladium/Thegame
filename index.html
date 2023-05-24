@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+ <title>Platformer Game</title>
+ <link rel="stylesheet" type="text/css" href="styles.css">
+ <link href="https://fonts.googleapis.com/css2?family=Orbitron&display=swap" rel="stylesheet">
+</head>
+<body>
+ <div class="game-container">
+  <div class="info-box">
+   <h2>Controls</h2>
+   <ul>
+     <li>Use the ARROW keys to move</li>
+     <li>ARROW-up to jump</li>
+     <li>Press 'SPACE-bar' to attack</li>
+     <li>Press 'W' to switch weapon</li>
+   </ul>
+   <h2>Power ups</h2>
+   <ul>
+     <li>Health packs</li>
+     <li>Damage boosters</li>
+     <li>Speed boosters</li>
+   </ul>
+  </div>
+
+  <canvas id="gameCanvas" width="800" height="600"></canvas>
+
+  <div class="status-box">
+   <h2>Game Status</h2>
+   <p id="score">Score: 0</p>
+   <p id="health">Health: 100</p>
+   <p id="weapon">Current weapon: None</p>
+  </div>
+ </div>
+
+ <script src="game.js"></script>
+</body>
+</html>
